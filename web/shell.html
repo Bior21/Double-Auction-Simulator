@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Double Auction Simulator</title>
+    <meta name="description" content="A market game: buy and sell crates of mangoes against a crowd of traders.">
+
+    <!-- The page around the game: the game's wood color, with the game centered
+         and shrunk to fit smaller screens. -->
+    <style>
+        html, body { margin: 0; height: 100%; background: #f3ece0; }
+        body { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        canvas.emscripten {
+            display: block;
+            width: min(960px, 100vw, calc(100vh * 960 / 720));
+            height: auto;
+            aspect-ratio: 960 / 720;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+            outline: none;
+        }
+        #status {
+            position: absolute;
+            color: #1c2430;
+            font: 18px system-ui, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <p id="status">Loading Double Auction Simulator...</p>
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+
+    <!-- The game draws see-through shapes. Asking the browser for a solid
+         canvas stops those shapes from mixing with the page behind it. -->
+    <script>
+        var originalGetContext = HTMLCanvasElement.prototype.getContext;
+        HTMLCanvasElement.prototype.getContext = function (type, options) {
+            if (type.indexOf("webgl") === 0) options = Object.assign({}, options, { alpha: false });
+            return originalGetContext.call(this, type, options);
+        };
+    </script>
+
+    <!-- Emscripten looks for this Module object to find the canvas and to report loading. -->
+    <script>
+        var Module = {
+            canvas: document.getElementById("canvas"),
+            print: function (text) { console.log(text); },
+            setStatus: function (text) {
+                document.getElementById("status").textContent = text;
+                if (text === "") document.getElementById("status").style.display = "none";
+            }
+        };
+    </script>
+    {{{ SCRIPT }}}
+</body>
+</html>
